@@ -4,15 +4,12 @@ import styled from 'styled-components'
 import { Saira_Stencil_One } from 'next/font/google'
 import { PrimaryInputWSearchIcon } from '../PrimaryInput'
 import { CartControl } from '../CartControl'
+import { useFilter } from '@/hooks/useFilter'
 
 const sairaStencilOne = Saira_Stencil_One({
   weight: ['400'],
   subsets: ['latin'],
 })
-
-interface HeaderProps {
-
-}
 
 const TagHeader = styled.header`
   display: flex;
@@ -35,14 +32,20 @@ const Logo = styled.a`
   line-height: 150%;
 `
 
-export function Header(props: HeaderProps) {
+export function Header() {
+  const { search, setSearch } = useFilter()
+
   return (
     <TagHeader>
       <Logo className={sairaStencilOne.className}>
         Capputeeno
       </Logo>
       <div>
-        <PrimaryInputWSearchIcon placeholder="Procurando por algo específico?" />
+        <PrimaryInputWSearchIcon
+          value={search}
+          handleChange={setSearch}
+          placeholder="Procurando por algo específico?"
+        />
         <CartControl />
       </div>
     </TagHeader>
