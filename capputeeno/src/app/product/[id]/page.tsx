@@ -2,10 +2,13 @@
 
 import { BackButton } from '@/components/BackButton'
 import { ShopBagIcon } from '@/components/icons/ShopBagIcon'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useProduct } from '@/hooks/useProduct'
+import { CartItem } from '@/types/cart-item'
 import { formatPrice } from '@/utils/format-price'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import { useCallback } from 'react'
 import styled from 'styled-components'
 
 interface ProductProps {
@@ -111,10 +114,28 @@ const ProductInfo = styled.div`
 
 export default function Product({ params }: ProductProps) {
   const { data } = useProduct(params.id)
+  const { value: cartItems, updateLocalStorage } = useLocalStorage<CartItem[]>('cart-items', []);
 
   // if (!data) {
   //   notFound()
   // }
+
+  const handleAddToCart = useCallback(() => {
+    if (!data) return;
+
+    const existingProductIndex = cartItems.findIndex(item => item.id === params.id)
+
+    if (existingProductIndex !== -1) {
+      cartItems[existingProductIndex].quantity++
+    } else {
+      cartItems.push({
+        ...data,
+        quantity: 1,
+      })
+    }
+
+    updateLocalStorage(cartItems)
+  }, [cartItems, params, data, updateLocalStorage])
 
   return (
     <Container>
@@ -136,7 +157,7 @@ export default function Product({ params }: ProductProps) {
             </div>
           </ProductInfo>
 
-          <button>
+          <button onClick={handleAddToCart}>
             <ShopBagIcon />
             Adicionar ao carrinho
           </button>
